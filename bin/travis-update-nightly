@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+import argparse
+import os.path
+import subprocess
+
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('repo')
+    parser.add_argument('branch')
+    args = parser.parse_args()
+
+    if 'GH_TOKEN' not in os.environ:
+        print('skipping...')
+        return 0
+
+    subprocess.check_call((
+        'git', 'clone', '-q', 'https://github.com/deadsnakes/runbooks',
+    ))
+    subprocess.check_call((
+        'git', 'clone', '-q',
+        f'https://{os.environ["GH_TOKEN"]}@github.com/deadsnakes/{args.repo}',
+    ))
+    subprocess.check_call((
+        os.path.join(HERE, 'update-nightly'), args.repo, args.branch,
+    ))
+    subprocess.check_call(
+        (os.path.abspath('runbooks/build'), '--git-build'),
+        cwd=args.repo,
+    )
+    subprocess.check_call((
+        'runbooks/quick-test',
+        '--distrib-codename', args.branch.split('/')[1],
+        '--dist-dir', 'dist',
+        '--src-dir', args.repo,
+    ))
+    subprocess.check_call(
+        (os.path.abspath('runbooks/build'), '--git-build', '--source'),
+        cwd=args.repo,
+    )
+    cfs = [f for f in os.listdir('dist') if f.endswith('.changes')]
+    subprocess.check_call(('dput', 'ppa:deadsnakes/nightly', *cfs), cwd='dist')
+    subprocess.check_call((
+        'git', '-C', args.repo,
+        'push', 'origin', '--tags', args.branch, 'upstream',
+    ))
+    return 0
+
+
+if __name__ == '__main__':
+    exit(main())
