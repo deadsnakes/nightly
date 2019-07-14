@@ -8,9 +8,10 @@ env:
     global:
     # GH_TOKEN
     -   secure: "hKBz/Dy8AcN0jFUFjfojGkm/LyHGgft+SgtRkZS3Zz/Xsgr7cJ3acZWaH+3udB/jFEQBjKDZBsDzNsl72Pd6wUXVXkaULycz5PaI7S3D/ymiC9bdVSUrk+RIQaqq8zwUwc/w6Ayds2aSGUgxIXtTJkIielYrkeGo1fLa5ogDADbLC88mrRGFRaJ6TMS4Ch6o9aKakLwFP62TqrJtUoNqrFAZJspTtDpGHx+J16VPnxNZbb1yZxZFHcidJoTsVF97FfnZ4o4Uit5Z3qa2henaMfP0y0HxpouGd+gJzDsfNchYwV/CH78rgAy8Elh+6PSR2L1+d+K2UVmgX1wNUeR+1/pGirf8HAgi8ZZuogvWWqO6BYQ8Tqes/NqIBeYVIuCIiUW1Mua42ajWHdSd8Wlw0KyX6DmSheOB+RaaBLDuvGPImxfOrANzgURipsjzavdSOBoVFR5Bz6/7zUyrrEOngiH/w90yXfWCyzvQkrypAmr6Kq/pjEddwjpjDIOJD5AYx/tyqRvbb2yeQTYuPYxt8VpYtNJ5wP/2e2FG+9/hsVhhRGxhqYH8nAoasahALqkQsaP3R/DI2pqbwpbXTNbF2LA7WXxgbw/bQr8zgoU6+GbSmsAis65I+dhlpk9d4DK64Pm33pUf3FRhbnTrZI9ehhpfNjQLE/w8GRNl0IesX/U="
+    -   DEBEMAIL="asottile+deadsnakes@umich.edu" DEBFULLNAME="Anthony Sottile (deadsnakes)"
 before_install:
 -   openssl aes-256-cbc -K $encrypted_8070d0a1622f_key -iv $encrypted_8070d0a1622f_iv -in gpg.tar.enc -out gpg.tar -d
 -   tar -C ~/.gnupg -xf gpg.tar
--   pip install gbp==0.9.8
--   sudo apt-get update -qq && sudo apt-get install -qqy devscripts
+-   sudo apt-get update -qq && sudo apt-get install -qqy devscripts >& /dev/null
+install: pip install -qq gbp==0.9.8
 script: bin/travis-update-nightly "$REPO" "$BRANCH"
