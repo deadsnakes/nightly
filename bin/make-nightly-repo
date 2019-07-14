@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+"""Before running this, make the `ubuntu/*` branches available in the source
+repository.
+
+~Usually you'll apply the following changes:
+- Disable the documentation build
+- Disable symbols checking
+- Disable copying of the NEWS file
+"""
+import argparse
+import os.path
+import shutil
+import subprocess
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('src')
+    parser.add_argument('dest')
+    args = parser.parse_args()
+
+    # upstream tag looks like `upstream/3.8.0_b2` we want `v3.8.0b2`
+    src_upstream_tag = subprocess.check_output((
+        'git', '-C', args.src,
+        'describe', 'origin/upstream', '--abbrev=0',
+    )).strip().decode()
+    tag = f'v{src_upstream_tag.split("/")[1].replace("_", "")}'
+
+    branches = subprocess.check_output((
+        'git', '-C', args.src, 'branch', '--format=%(refname:short)',
+    )).decode().splitlines()
+    ubuntu_branches = [line for line in branches if line.startswith('ubuntu/')]
+
+    if os.path.exists(args.dest):
+        shutil.rmtree(args.dest)
+
+    subprocess.check_call(('git', 'init', args.dest))
+    # ubuntu/xenial => cpython@(current tag) + debian branch from `src`
+    # ubuntu/bionic => cpython@(current tag) + debian branch from `src`
+    # upstream => cpython@(current tag)
+    subprocess.check_call((
+        'git', '-C', args.dest,
+        'remote', 'add', 'cpython', 'git@github.com:python/cpython',
+    ))
+    subprocess.check_call((
+        'git', '-C', args.dest,
+        'fetch', 'cpython', f'refs/tags/{tag}:refs/tags/{tag}',
+    ))
+    subprocess.check_call((
+        'git', '-C', args.dest,
+        'checkout', 'FETCH_HEAD', '-b', 'upstream',
+    ))
+    for branch in ubuntu_branches:
+        subprocess.check_call((
+            'git', '-C', args.dest, 'checkout', 'upstream', '-b', branch,
+        ))
+        subprocess.check_call((
+            'git', '-C', args.src, 'checkout', branch,
+        ))
+        shutil.copytree(
+            os.path.join(args.src, 'debian'),
+            os.path.join(args.dest, 'debian'),
+        )
+        subprocess.check_call(('git', '-C', args.dest, 'add', 'debian'))
+        subprocess.check_call((
+            'git', '-C', args.dest, 'commit', '-m',
+            'Import debian directory from deadsnakes',
+        ))
+    subprocess.check_call(('git', '-C', args.dest, 'remote', 'rm', 'cpython'))
+
+    return 0
+
+
+if __name__ == '__main__':
+    exit(main())

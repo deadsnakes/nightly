@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+import argparse
+import datetime
+import os.path
+import re
+import subprocess
+
+VERSION_RE = re.compile(r'^v(\d+\.\d+\.\d+)((?:a|b|rc)\d+)(.*)$')
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('repo')
+    parser.add_argument('--branch', required=True)
+    args = parser.parse_args()
+
+    os.chdir(args.repo)
+
+    _, dist = args.branch.split('/')
+    subprocess.check_call(('git', 'checkout', args.branch))
+
+    with open('debian/rules') as f:
+        for line in f:
+            if line.startswith('VER='):
+                _, version = line.strip().split('=')
+                break
+        else:
+            raise AssertionError('could not find version!')
+
+    subprocess.check_call((
+        'git', 'remote', 'add', 'cpython', 'https://github.com/python/cpython',
+    ))
+    subprocess.check_call((
+        'git', 'fetch', 'cpython', f'refs/heads/{version}:refs/heads/upstream',
+    ))
+
+    current_tag = subprocess.check_output((
+        'git', 'describe', '--tags', 'upstream',
+    )).decode().strip()
+    if current_tag.startswith('deadsnakes/'):
+        print('already up to date!')
+        return 0
+
+    v_match = VERSION_RE.match(current_tag)
+    if not v_match:
+        raise SystemExit(f'Unexpected tag: {current_tag}')
+    if v_match[2]:  # if it is a pre-release
+        debian_version = f'{v_match[1]}~{v_match[2]}{v_match[3]}-1+{dist}1'
+        deadsnakes_tag = f'deadsnakes/v{v_match[1]}_{v_match[2]}{v_match[3]}'
+    else:
+        debian_version = f'{v_match[1]}{v_match[3]}-1+{dist}1'
+        deadsnakes_tag = f'deadsnakes/v{v_match[1]}{v_match[3]}'
+
+    subprocess.check_call(('git', 'tag', deadsnakes_tag, 'upstream'))
+    subprocess.check_call(('gbp', 'pq', 'import'))
+    subprocess.check_call(('git', 'checkout', args.branch))
+    subprocess.check_call(('git', 'merge', 'upstream', '--no-edit'))
+    subprocess.check_call(('gbp', 'pq', 'rebase'))
+    subprocess.check_call(('gbp', 'pq', 'export'))
+    subprocess.check_call(('git', 'add', 'debian/patches'))
+    subprocess.check_call(('git', 'commit', '-m', 'Refresh patches'))
+    subprocess.check_call((
+        'dch', '--newversion', debian_version, '--distribution', dist,
+        f'Update to {current_tag} ({datetime.date.today()}).',
+    ))
+    subprocess.check_call((
+        'git', 'commit', '-am', f'Finish changelog ({datetime.date.today()}',
+    ))
+    # 5. build
+    return 0
+
+
+if __name__ == '__main__':
+    exit(main())
