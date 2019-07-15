@@ -5,6 +5,9 @@ nightly
 
 nightly builds of select python packages.
 
+for released versions use
+[ppa:deadsnakes/ppa](https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa)
+
 ## tl;dr
 
 https://launchpad.net/~deadsnakes/+archive/ubuntu/nightly

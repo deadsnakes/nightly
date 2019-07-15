@@ -12,16 +12,16 @@ variables:
   GIT_COMMITTER_NAME: 'Anthony Sottile'
   GIT_COMMITTER_EMAIL: 'asottile+deadsnakes@umich.edu'
 jobs:
-- job: 'test'
+- job: package
   pool:
     vmImage: ubuntu-16.04
   strategy:
     matrix:
       bionic-38:
-        REPO: 'python3.8-nightly'
+        REPO: python3.8-nightly
         DIST: bionic
       xenial-38:
-        REPO: 'python3.8-nightly'
+        REPO: python3.8-nightly
         DIST: xenial
   steps:
   - task: UsePythonVersion@0
