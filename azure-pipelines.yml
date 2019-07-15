@@ -1,0 +1,38 @@
+trigger: [master]
+variables:
+  DEBEMAIL: 'asottile+deadsnakes@umich.edu'
+  DEBFULLNAME: 'Anthony Sottile (deadsnakes)'
+  GIT_AUTHOR_NAME: 'Anthony Sottile'
+  GIT_AUTHOR_EMAIL: 'asottile+deadsnakes@umich.edu'
+  GIT_COMMITTER_NAME: 'Anthony Sottile'
+  GIT_COMMITTER_EMAIL: 'asottile+deadsnakes@umich.edu'
+jobs:
+- job: 'test'
+  pool:
+    vmImage: ubuntu-16.04
+  strategy:
+    matrix:
+      bionic-38:
+        REPO: 'python3.8-nightly'
+        BRANCH: 'ubuntu/bionic'
+      xenial-38:
+        REPO: 'python3.8-nightly'
+        BRANCH: 'ubuntu/xenial'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.7'
+  - bash: pip install gbp==0.9.8
+    displayName: install gbp
+  - bash: sudo apt-get update -qq && sudo apt-get install -y devscripts
+    displayName: install devscripts
+  - task: DownloadSecureFile@1
+    name: gpg
+    inputs:
+      secureFile: gpg.tar
+  - bash: mkdir ~/.gnupg && tar -C ~/.gnupg -xvf $(gpg.secureFilePath)
+    displayName: extract deadsnakes gpg key
+  - bash: bin/ci-update-nightly $(REPO) $(BRANCH)
+    displayName: run build
+    env:
+      GH_TOKEN: $(GH_TOKEN)
