@@ -14,4 +14,4 @@ before_install:
 -   tar -C ~/.gnupg -xf gpg.tar
 -   sudo apt-get update -qq && sudo apt-get install -qqy devscripts >& /dev/null
 install: pip install -qq gbp==0.9.8
-script: bin/travis-update-nightly "$REPO" "$BRANCH"
+script: bin/ci-update-nightly "$REPO" "$BRANCH"
