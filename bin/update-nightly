@@ -39,7 +39,7 @@ def main() -> int:
     )).decode().strip()
     if current_tag.startswith('deadsnakes/'):
         print('already up to date!')
-        return 0
+        return 42
 
     v_match = VERSION_RE.match(current_tag)
     if not v_match:

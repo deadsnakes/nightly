@@ -25,9 +25,13 @@ def main() -> int:
         'git', 'clone', '-q',
         f'https://{os.environ["GH_TOKEN"]}@github.com/deadsnakes/{args.repo}',
     ))
-    subprocess.check_call((
+    ret = subprocess.call((
         os.path.join(HERE, 'update-nightly'), args.repo, args.branch,
     ))
+    if ret == 42:
+        return 0
+    elif ret:
+        raise AssertionError(f'error ({ret}) running update-nightly')
     subprocess.check_call(
         (os.path.abspath('runbooks/build'), '--git-build'),
         cwd=args.repo,
