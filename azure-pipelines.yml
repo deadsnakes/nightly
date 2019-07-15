@@ -23,6 +23,12 @@ jobs:
       xenial-38:
         REPO: python3.8-nightly
         DIST: xenial
+      bionic-37:
+        REPO: python3.7-nightly
+        DIST: bionic
+      xenial-37:
+        REPO: python3.7-nightly
+        DIST: xenial
   steps:
   - task: UsePythonVersion@0
     inputs:
