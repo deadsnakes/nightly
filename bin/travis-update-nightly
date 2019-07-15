@@ -41,7 +41,10 @@ def main() -> int:
         cwd=args.repo,
     )
     cfs = [f for f in os.listdir('dist') if f.endswith('.changes')]
-    subprocess.check_call(('dput', 'ppa:deadsnakes/nightly', *cfs), cwd='dist')
+    subprocess.check_call(
+        ('dput', '-u', 'ppa:deadsnakes/nightly', *cfs),
+        cwd='dist',
+    )
     subprocess.check_call((
         'git', '-C', args.repo,
         'push', 'origin', '--tags', args.branch, 'upstream',
