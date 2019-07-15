@@ -65,7 +65,8 @@ def main() -> int:
     subprocess.check_call(('gbp', 'pq', 'rebase'))
     subprocess.check_call(('gbp', 'pq', 'export'))
     subprocess.check_call(('git', 'add', 'debian/patches'))
-    subprocess.check_call(('git', 'commit', '-m', 'Refresh patches'))
+    if subprocess.call(('git', 'diff', '--staged', '--quiet')):
+        subprocess.check_call(('git', 'commit', '-m', 'Refresh patches'))
     subprocess.check_call((
         'dch', '--newversion', debian_version, '--distribution', dist,
         f'Update to {current_tag} ({datetime.date.today()}).',
