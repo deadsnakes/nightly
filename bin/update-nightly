@@ -72,7 +72,7 @@ def main() -> int:
         f'Update to {current_tag} ({datetime.date.today()}).',
     ))
     subprocess.check_call((
-        'git', 'commit', '-am', f'Finish changelog ({datetime.date.today()}',
+        'git', 'commit', '-am', f'Finish changelog ({datetime.date.today()})',
     ))
     return 0
 
