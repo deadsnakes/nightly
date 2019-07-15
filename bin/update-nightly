@@ -34,13 +34,20 @@ def main() -> int:
         'git', 'fetch', 'cpython', f'refs/heads/{version}:refs/heads/upstream',
     ))
 
-    current_tag = subprocess.check_output((
-        'git', 'describe', '--tags', 'upstream',
-    )).decode().strip()
-    if current_tag.startswith('deadsnakes/'):
-        print('already up to date!')
+    # an exact tag means either upstream released or we already built this
+    tag_cmd = ('git', 'describe', '--tags', 'upstream')
+    if subprocess.call(tag_cmd + ('--exact',), stderr=subprocess.DEVNULL) == 0:
+        print('already up to date')
         return 42
 
+    # delete all of the deadsnakes tags so they are not considered
+    for tag in subprocess.check_output(('git', 'tag', '--list')).splitlines():
+        if tag.startswith(b'deadsnakes/'):
+            subprocess.check_call(
+                ('git', 'tag', '-d', tag), stdout=subprocess.DEVNULL,
+            )
+
+    current_tag = subprocess.check_output(tag_cmd).decode().strip()
     v_match = VERSION_RE.match(current_tag)
     if not v_match:
         raise SystemExit(f'Unexpected tag: {current_tag}')
