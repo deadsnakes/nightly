@@ -19,10 +19,10 @@ jobs:
     matrix:
       bionic-38:
         REPO: 'python3.8-nightly'
-        BRANCH: 'ubuntu/bionic'
+        DIST: bionic
       xenial-38:
         REPO: 'python3.8-nightly'
-        BRANCH: 'ubuntu/xenial'
+        DIST: xenial
   steps:
   - task: UsePythonVersion@0
     inputs:
@@ -37,7 +37,33 @@ jobs:
       secureFile: gpg.tar
   - bash: mkdir ~/.gnupg && tar -C ~/.gnupg -xvf $(gpg.secureFilePath)
     displayName: extract deadsnakes gpg key
-  - bash: bin/ci-update-nightly $(REPO) $(BRANCH)
-    displayName: run build
-    env:
-      GH_TOKEN: $(GH_TOKEN)
+  - bash: git clone -q --depth 1 https://github.com/deadsnakes/runbooks
+    displayName: clone runbooks repo
+  - bash: git clone -q https://$(GH_TOKEN)@github.com/deadsnakes/$(REPO)
+    displayName: clone target repo
+  - bash: |
+      set -euxo pipefail
+      ret=0; bin/update-nightly $(REPO) ubuntu/$(DIST) || ret=$?
+      if [ $ret -eq 42 ]; then
+        echo '##vso[task.setvariable variable=skip]true'
+      elif [ $ret -ne 0 ]; then
+        return 1
+      else
+        echo '##vso[task.setvariable variable=skip]false'
+      fi
+    displayName: update branches
+  - bash: mkdir dist && cd $(REPO) && ../runbooks/build --git-build
+    displayName: build
+    condition: and(succeeded(), eq(variables.skip, 'false'))
+  - bash: runbooks/quick-test --distrib-codename $(DIST) --dist-dir dist --src-dir $(REPO)
+    displayName: test
+    condition: and(succeeded(), eq(variables.skip, 'false'))
+  - bash: rm -rf dist && cd $(REPO) && ../runbooks/build --source --git-build
+    displayName: build source package
+    condition: and(succeeded(), eq(variables.skip, 'false'))
+  - bash: cd dist && dput -d -u ppa:deadsnakes/nightly *.changes
+    displayName: upload package
+    condition: and(succeeded(), eq(variables.skip, 'false'))
+  - bash: git -C $(REPO) push origin --tags ubuntu/$(DIST) upstream
+    displayName: push branches
+    condition: and(succeeded(), eq(variables.skip, 'false'))
