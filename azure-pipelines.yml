@@ -74,3 +74,8 @@ jobs:
   - bash: git -C $(REPO) push origin --tags ubuntu/$(DIST) upstream
     displayName: push branches
     condition: and(succeeded(), eq(variables.skip, 'false'))
+  - bash: |
+        git clone -q --branch log https://$(GH_TOKEN)@github.com/deadsnakes/nightly
+        git -C nightly commit --allow-empty --amend --no-edit
+        git -C nightly push origin HEAD -f
+    displayName: scheduled builds hack
