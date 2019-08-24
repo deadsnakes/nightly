@@ -78,5 +78,5 @@ jobs:
   - bash: |
         git clone -q --branch log https://$(GH_TOKEN)@github.com/deadsnakes/nightly
         git -C nightly commit --allow-empty --amend --no-edit
-        git -C nightly push origin HEAD -f
+        git -C nightly push origin HEAD -f || true
     displayName: scheduled builds hack
