@@ -14,6 +14,7 @@ variables:
   GIT_COMMITTER_EMAIL: 'asottile+deadsnakes@umich.edu'
 jobs:
 - job: package
+  timeoutInMinutes: 120
   pool:
     vmImage: ubuntu-16.04
   strategy:
