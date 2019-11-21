@@ -19,6 +19,12 @@ jobs:
     vmImage: ubuntu-16.04
   strategy:
     matrix:
+      bionic-39:
+        REPO: python3.9-nightly
+        DIST: bionic
+      xenial-39:
+        REPO: python3.9-nightly
+        DIST: xenial
       bionic-38:
         REPO: python3.8-nightly
         DIST: bionic
@@ -75,8 +81,12 @@ jobs:
   - bash: git -C $(REPO) push origin --tags ubuntu/$(DIST) upstream
     displayName: push branches
     condition: and(succeeded(), eq(variables.skip, 'false'))
+- job: hack
+  pool:
+    vmImage: ubuntu-16.04
+  steps:
   - bash: |
         git clone -q --branch log https://$(GH_TOKEN)@github.com/deadsnakes/nightly
         git -C nightly commit --allow-empty --amend --no-edit
-        git -C nightly push origin HEAD -f || true
+        git -C nightly push origin HEAD -f
     displayName: scheduled builds hack

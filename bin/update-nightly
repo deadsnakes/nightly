@@ -30,9 +30,17 @@ def main() -> int:
     subprocess.check_call((
         'git', 'remote', 'add', 'cpython', 'https://github.com/python/cpython',
     ))
-    subprocess.check_call((
-        'git', 'fetch', 'cpython', f'refs/heads/{version}:refs/heads/upstream',
-    ))
+
+    def _fetch_upstream(branch: str) -> None:
+        subprocess.check_call((
+            'git', 'fetch', 'cpython',
+            f'refs/heads/{branch}:refs/heads/upstream',
+        ))
+
+    try:
+        _fetch_upstream(version)
+    except subprocess.CalledProcessError:
+        _fetch_upstream('master')
 
     # an exact tag means either upstream released or we already built this
     tag_cmd = ('git', 'describe', '--tags', 'upstream')
