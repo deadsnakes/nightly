@@ -27,9 +27,11 @@ def main() -> int:
         else:
             raise AssertionError('could not find version!')
 
-    subprocess.check_call((
-        'git', 'remote', 'add', 'cpython', 'https://github.com/python/cpython',
-    ))
+    if subprocess.call(('git', 'config', 'remote.cpython.url')):
+        subprocess.check_call((
+            'git', 'remote', 'add',
+            'cpython', 'https://github.com/python/cpython',
+        ))
 
     def _fetch_upstream(branch: str) -> None:
         subprocess.check_call((
