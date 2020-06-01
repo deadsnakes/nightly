@@ -19,6 +19,15 @@ jobs:
     vmImage: ubuntu-16.04
   strategy:
     matrix:
+      bionic-310:
+        REPO: python3.10-nightly
+        DIST: bionic
+      focal-310:
+        REPO: python3.10-nightly
+        DIST: focal
+      xenial-310:
+        REPO: python3.10-nightly
+        DIST: xenial
       bionic-39:
         REPO: python3.9-nightly
         DIST: bionic
