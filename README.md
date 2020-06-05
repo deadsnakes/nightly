@@ -36,3 +36,4 @@ packages are only built for the amd64 architecture for the following:
 - python3.7 (xenial, bionic)
 - python3.8 (xenial, bionic)
 - python3.9 (xenial, bionic, focal)
+- python3.10 (xenial, bionic, focal)
