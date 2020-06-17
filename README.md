@@ -1,5 +1,3 @@
-[![Build Status](https://dev.azure.com/deadsnakes/deadsnakes/_apis/build/status/deadsnakes.nightly?branchName=master)](https://dev.azure.com/deadsnakes/deadsnakes/_build/latest?definitionId=1&branchName=master)
-
 nightly
 =======
 
@@ -33,7 +31,7 @@ these packages are missing a few things to make the builds more automatable
 
 packages are only built for the amd64 architecture for the following:
 
-- python3.7 (xenial, bionic)
-- python3.8 (xenial, bionic)
-- python3.9 (xenial, bionic, focal)
-- python3.10 (xenial, bionic, focal)
+- [![Build Status](https://github.com/deadsnakes/python3.7-nightly/workflows/main/badge.svg)](https://github.com/deadsnakes/python3.7-nightly/actions) python3.7 (xenial, bionic)
+- [![Build Status](https://github.com/deadsnakes/python3.8-nightly/workflows/main/badge.svg)](https://github.com/deadsnakes/python3.8-nightly/actions) python3.8 (xenial, bionic)
+- [![Build Status](https://github.com/deadsnakes/python3.9-nightly/workflows/main/badge.svg)](https://github.com/deadsnakes/python3.9-nightly/actions) python3.9 (xenial, bionic, focal)
+- [![Build Status](https://github.com/deadsnakes/python3.10-nightly/workflows/main/badge.svg)](https://github.com/deadsnakes/python3.10-nightly/actions) python3.10 (xenial, bionic, focal)
