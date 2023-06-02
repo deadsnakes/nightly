@@ -30,6 +30,6 @@ these packages are missing a few things to make the builds more automatable
 ## available packages
 
 packages are only built for the amd64 architecture for the following:
-- [![Build Status](https://github.com/deadsnakes/python3.10-nightly/actions/workflows/main.yml/badge.svg)](https://github.com/deadsnakes/python3.10-nightly/actions/workflows/main.yml) python3.10 (bionic, focal)
 - [![Build Status](https://github.com/deadsnakes/python3.11-nightly/actions/workflows/main.yml/badge.svg)](https://github.com/deadsnakes/python3.11-nightly/actions/workflows/main.yml) python3.11 (bionic, focal, jammy)
 - [![Build Status](https://github.com/deadsnakes/python3.12-nightly/actions/workflows/main.yml/badge.svg)](https://github.com/deadsnakes/python3.12-nightly/actions/workflows/main.yml) python3.12 (focal, jammy)
+- [![Build Status](https://github.com/deadsnakes/python3.13-nightly/actions/workflows/main.yml/badge.svg)](https://github.com/deadsnakes/python3.13-nightly/actions/workflows/main.yml) python3.13 (focal, jammy)
