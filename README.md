@@ -17,7 +17,5 @@ sudo apt update
 
 ## available packages
 
-packages are only built for the amd64 architecture for the following:
-- [![Build Status](https://github.com/deadsnakes/python3.12-nightly/actions/workflows/main.yml/badge.svg)](https://github.com/deadsnakes/python3.12-nightly/actions/workflows/main.yml) python3.12 (focal, jammy)
-- [![Build Status](https://github.com/deadsnakes/py3.13/actions/workflows/main.yml/badge.svg)](https://github.com/deadsnakes/py3.13/actions/workflows/main.yml) python3.13 (focal, jammy, noble)
-- [![Build Status](https://github.com/deadsnakes/python3.14-nightly/actions/workflows/main.yml/badge.svg)](https://github.com/deadsnakes/python3.14-nightly/actions/workflows/main.yml) python3.14 (jammy, noble)
+packages are only built for the amd64 and arm64 architectures for
+[currently developed pythons](https://devguide.python.org/versions/)
